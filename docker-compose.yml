@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVE_FOLDERS=/app/folder1,/app/folder2
+    volumes:
+      - ./folder1:/app/folder1
+      - ./folder2:/app/folder2
