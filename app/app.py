@@ -1,15 +1,35 @@
+import warnings
 from flask import Flask, Response, send_file, render_template, redirect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import requests
+from pymemcache.client import base
 from typing import Optional, Dict, Any
 from werkzeug import Response as WerkzeugResponse
 from datetime import datetime, timedelta
 
+# Suppress the specific warning about in-memory storage for Flask-Limiter
+warnings.filterwarnings(
+    "ignore",
+    message="Using the in-memory storage for tracking rate limits as no storage was explicitly specified",
+)
+
 app = Flask(import_name=__name__)
+
+# Initialize Flask-Limiter with Memcached storage
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri="memcached://memcached:11211",
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+)
+
+# Configure Memcached client
+mc = base.Client(("memcached", 11211))
 
 # Cache for the GPG key and the time it was last updated
 _key_cache: str | None = None
 _key_cache_time: datetime | None = None
-
 
 CACHE_TIMEOUT: int = 300  # Cache timeout in seconds
 git_cache: Dict[Any, Any] = {}
@@ -55,6 +75,7 @@ def fetch_latest_package_zip(
 
 @app.route(rule="/gpg", methods=["GET"])
 @app.route(rule="/key", methods=["GET"])
+@limiter.limit("10 per minute")
 def gpg() -> Response:
     global _key_cache, _key_cache_time
     # Check if the cache is empty or older than an hour
@@ -71,6 +92,7 @@ def gpg() -> Response:
 
 
 @app.route(rule="/lshw-parser", methods=["GET"])
+@limiter.limit("5 per minute")
 def lshw_parser() -> WerkzeugResponse:
     return redirect(
         location="https://github.com/ScarlettSamantha/lshw-parser", code=301
@@ -78,6 +100,7 @@ def lshw_parser() -> WerkzeugResponse:
 
 
 @app.route("/lshw-parser/download", methods=["GET"])
+@limiter.limit("5 per minute")
 def lshw_parser_download() -> WerkzeugResponse:
     zip_url: str | None = fetch_latest_package_zip(
         author="ScarlettSamantha", package="lshw-parser"
@@ -94,11 +117,13 @@ def lshw_parser_download() -> WerkzeugResponse:
 
 
 @app.route(rule="/openciv", methods=["GET"])
+@limiter.limit("5 per minute")
 def openciv() -> WerkzeugResponse:
     return redirect(location="https://github.com/ScarlettSamantha/OpenCiv", code=301)
 
 
 @app.route("/openciv/download", methods=["GET"])
+@limiter.limit("5 per minute")
 def openciv_download() -> WerkzeugResponse:
     zip_url: str | None = fetch_latest_package_zip(
         author="ScarlettSamantha", package="OpenCiv"
@@ -115,6 +140,7 @@ def openciv_download() -> WerkzeugResponse:
 
 
 @app.route(rule="/cv/download", methods=["GET"])
+@limiter.limit("10 per minute")
 def cv_download() -> Response:
     # Serve the CV PDF file and force it to download
     return send_file(
@@ -125,6 +151,7 @@ def cv_download() -> Response:
 
 
 @app.route(rule="/cv/download/key", methods=["GET"])
+@limiter.limit("10 per minute")
 def cv_download_key() -> Response:
     # Serve the PGP signature for the CV and force it to download
     return send_file(
@@ -135,6 +162,7 @@ def cv_download_key() -> Response:
 
 
 @app.route(rule="/cv", methods=["GET"])
+@limiter.limit("10 per minute")
 def cv() -> Response:
     # Serve the CV PDF file
     return send_file(
@@ -144,6 +172,7 @@ def cv() -> Response:
 
 @app.route(rule="/", defaults={"path": ""})
 @app.route(rule="/<path:path>")
+@limiter.limit("10 per minute")
 def catch_all(path: str) -> str:
     # Render the home page template for any undefined routes
     return render_template(template_name_or_list="home.j2")

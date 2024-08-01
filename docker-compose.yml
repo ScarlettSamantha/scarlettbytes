@@ -3,9 +3,18 @@ version: '3.8'
 services:
   web:
     restart: always
-    build: ./app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
     ports:
       - 8900:8000
     environment:
       - FLASK_ENV=development
+    depends_on:
+      - memcached
 
+  memcached:
+    image: memcached:latest
+    restart: always
+    ports:
+      - 11211:11211
