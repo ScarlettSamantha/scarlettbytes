@@ -176,8 +176,3 @@ def cv() -> Response:
 def catch_all(path: str) -> str:
     # Render the home page template for any undefined routes
     return render_template(template_name_or_list="home.j2")
-
-
-if __name__ == "__main__":
-    # Run the Flask application
-    app.run(host="0.0.0.0", port=8000)
