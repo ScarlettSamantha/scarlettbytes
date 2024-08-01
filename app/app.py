@@ -25,7 +25,7 @@ limiter = Limiter(
 )
 
 # Configure Memcached client
-mc = base.Client(("memcached", 11211))
+mc = base.Client(server=("memcached", 11211))
 
 # Cache for the GPG key and the time it was last updated
 _key_cache: str | None = None
@@ -75,7 +75,7 @@ def fetch_latest_package_zip(
 
 @app.route(rule="/gpg", methods=["GET"])
 @app.route(rule="/key", methods=["GET"])
-@limiter.limit("10 per minute")
+@limiter.limit(limit_value="10 per minute")
 def gpg() -> Response:
     global _key_cache, _key_cache_time
     # Check if the cache is empty or older than an hour
@@ -92,15 +92,15 @@ def gpg() -> Response:
 
 
 @app.route(rule="/lshw-parser", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit(limit_value="5 per minute")
 def lshw_parser() -> WerkzeugResponse:
     return redirect(
         location="https://github.com/ScarlettSamantha/lshw-parser", code=301
     )
 
 
-@app.route("/lshw-parser/download", methods=["GET"])
-@limiter.limit("5 per minute")
+@app.route(rule="/lshw-parser/download", methods=["GET"])
+@limiter.limit(limit_value="5 per minute")
 def lshw_parser_download() -> WerkzeugResponse:
     zip_url: str | None = fetch_latest_package_zip(
         author="ScarlettSamantha", package="lshw-parser"
@@ -117,13 +117,13 @@ def lshw_parser_download() -> WerkzeugResponse:
 
 
 @app.route(rule="/openciv", methods=["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit(limit_value="5 per minute")
 def openciv() -> WerkzeugResponse:
     return redirect(location="https://github.com/ScarlettSamantha/OpenCiv", code=301)
 
 
-@app.route("/openciv/download", methods=["GET"])
-@limiter.limit("5 per minute")
+@app.route(rule="/openciv/download", methods=["GET"])
+@limiter.limit(limit_value="5 per minute")
 def openciv_download() -> WerkzeugResponse:
     zip_url: str | None = fetch_latest_package_zip(
         author="ScarlettSamantha", package="OpenCiv"
@@ -140,7 +140,7 @@ def openciv_download() -> WerkzeugResponse:
 
 
 @app.route(rule="/cv/download", methods=["GET"])
-@limiter.limit("10 per minute")
+@limiter.limit(limit_value="10 per minute")
 def cv_download() -> Response:
     # Serve the CV PDF file and force it to download
     return send_file(
@@ -151,7 +151,7 @@ def cv_download() -> Response:
 
 
 @app.route(rule="/cv/download/key", methods=["GET"])
-@limiter.limit("10 per minute")
+@limiter.limit(limit_value="10 per minute")
 def cv_download_key() -> Response:
     # Serve the PGP signature for the CV and force it to download
     return send_file(
@@ -162,7 +162,7 @@ def cv_download_key() -> Response:
 
 
 @app.route(rule="/cv", methods=["GET"])
-@limiter.limit("10 per minute")
+@limiter.limit(limit_value="10 per minute")
 def cv() -> Response:
     # Serve the CV PDF file
     return send_file(
