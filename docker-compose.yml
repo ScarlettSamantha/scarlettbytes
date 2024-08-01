@@ -9,7 +9,7 @@ services:
     ports:
       - 8900:8000
     environment:
-      - FLASK_ENV=development
+      - FLASK_ENV=production
     depends_on:
       - memcached
 
