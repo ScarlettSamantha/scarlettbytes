@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scarlett Verheul</title>
+    <meta name="description" content="Scarlett's personal website, featuring GPG public key, CV, and various projects.">
+    <meta name="keywords" content="Scarlett, personal website, GPG key, CV, lshw-parser, OpenCiv, Flask, Python, projects">
+    <meta name="author" content="Scarlett S. Verheul">
+    <meta property="og:title" content="Scarlett Verheul">
+    <meta property="og:description" content="Welcome to my personal website, you can find my C.V and links to projects here.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://scarlettbytes.nl">
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #ddd;
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle, #260030, #000000);
+        background-size: 200% 200%;
+        animation: radiateAnimation 10s ease infinite, waveAnimation 20s linear infinite;
+        overflow: hidden; /* Ensures the body takes the full screen for the effect */
+    }
+
+    @keyframes radiateAnimation {
+        0% {
+            background-position: 50% 50%;
+        }
+        50% {
+            background-position: 100% 100%;
+        }
+        100% {
+            background-position: 50% 50%;
+        }
+    }
+
+    @keyframes waveAnimation {
+        0% {
+            background-size: 200% 200%, 50% 50%;
+        }
+        50% {
+            background-size: 150% 150%, 100% 100%;
+        }
+        100% {
+            background-size: 200% 200%, 50% 50%;
+        }
+    }
+
+    a {
+        color: #1E90FF;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: rgba(20, 20, 20, 0.9);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+    }
+
+    .header, .footer {
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    .header {
+        border-bottom: 2px solid #1E90FF;
+    }
+
+    .content {
+        padding: 20px 0;
+    }
+
+    .footer {
+        border-top: 2px solid #1E90FF;
+        font-size: 0.9em;
+        color: #999;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    ul li {
+        margin: 10px 0;
+    }
+
+    ul li a:not(.no_style) {
+        display: inline-block;
+        padding: 10px 15px;
+        border: 1px solid #1E90FF;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    ul li a:hover {
+        background-color: #1E90FF;
+        color: #fff;
+    }
+</style>
+
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome, I am Scarlett</h1>
+            <p>This domain is just a place for me to host some things so this main page is just static.</p>
+        </div>
+        <div class="content">
+            <ul>
+                <li><a target="_blank" href="{{ url_for('gpg') }}">GPG Public Key</a></li>
+                <li>
+                    <a target="_blank" href="{{ url_for('cv') }}">Curriculum Vitae (CV)</a>
+                    [<a class="no_style" href="{{ url_for('cv_download') }}">File</a>]
+                    | [<a class="no_style" href="{{ url_for('cv_download_key') }}">Key</a>]
+                </li>
+                <li><a target="_blank" href="https://github.com/ScarlettSamantha">GitHub Profile☍</a></li>
+                <li><a target="_blank" href="{{ url_for('lshw_parser') }}">lshw-parser Project☍</a> [<a class="no_style" target="_blank" href="{{ url_for('lshw_parser_download') }}">latest zip☍</a>]</li>
+                <li><a target="_blank" href="{{ url_for('lshw_parser_download') }}">OpenCiv Project☍</a> [<a class="no_style" target="_blank" href="{{ url_for('openciv_download') }}">latest zip☍</a>]</li>
+                <li><a target="_blank" href="https://todo.arcane-tech.nl">Personal Todo(🔒)</a></li>
+            </ul>
+            <p>Please note: I do not appreciate unsolicited contact from bots or external recruiters. For legitimate inquiries, you can find my email via WHOIS: <a href="https://www.sidn.nl/whois?q=scarlettbytes.nl" target="_blank">Whois☍</a></p>
+        </div>
+        <div class="footer">
+            <p>With 💜, Scarlett from the Netherlands 🇳🇱🇪🇺</p>
+            <p>Powered by Flask⚗️ and Python🐍 [<a target="_blank" href="https://github.com/ScarlettSamantha/scarlettbytes">Source☍</a>]</p>
+            <p>This site respects your privacy: no tracking, no cookies🔒. Please be aware that ☍ links lead to external domains, which may have their own tracking policies.</p>
+        </div>
+    </div>
+</body>
+</html>

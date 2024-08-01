@@ -1,9 +1,11 @@
+version: '3.8'
+
 services:
   web:
-    build: .
+    restart: always
+    build: ./app
     ports:
-      - "8100:8000"
+      - 8900:8000
     environment:
-      - SERVE_FOLDERS=/app/web,
-    volumes:
-      - ./web:/app/web
+      - FLASK_ENV=development
+
