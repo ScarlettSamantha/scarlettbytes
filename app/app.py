@@ -7,7 +7,6 @@ from pymemcache.client import base
 from typing import Optional, Dict, Any
 from werkzeug import Response as WerkzeugResponse
 from datetime import datetime, timedelta
-from git import Repo, GitCommandError
 
 # Suppress the specific warning about in-memory storage for Flask-Limiter
 warnings.filterwarnings(
@@ -36,18 +35,23 @@ CACHE_TIMEOUT: int = 300  # Cache timeout in seconds
 git_cache: Dict[Any, Any] = {}
 
 
-def get_git_info() -> Dict[str, str]:
+def get_git_info(author: str, repo: str) -> Dict[str, str]:
     """
-    Get the short hash and branch name of the current checked-out commit.
+    Get the short hash and branch name of the latest commit from the GitHub repository.
 
+    :param author: The author of the repository
+    :param repo: The name of the repository
     :return: Dictionary containing the short hash and branch name
     """
-    try:
-        repo = Repo(search_parent_directories=True)
-        commit_hash = repo.git.rev_parse(repo.head.commit.hexsha, short=True)
-        branch_name = repo.active_branch.name
+    api_url = f"https://api.github.com/repos/{author}/{repo}/commits"
+    response = requests.get(api_url)
+
+    if response.status_code == 200:
+        latest_commit = response.json()[0]
+        commit_hash = latest_commit["sha"][:7]
+        branch_name = "main"  # Assuming the main branch is 'main'
         return {"commit_hash": commit_hash, "branch_name": branch_name}
-    except GitCommandError:
+    else:
         return {"commit_hash": "unknown", "branch_name": "unknown"}
 
 
@@ -191,7 +195,9 @@ def cv() -> Response:
 @limiter.limit("10 per minute")
 def catch_all(path: str) -> str:
     # Get the current Git commit hash and branch name
-    git_info = get_git_info()
+    git_info = get_git_info(
+        author="ScarlettSamantha", repo="repository-name"
+    )  # Replace 'repository-name' with your actual repo name
     # Render the home page template with the git information
     return render_template(
         template_name_or_list="home.j2",
