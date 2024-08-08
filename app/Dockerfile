@@ -10,6 +10,9 @@ COPY requirements.txt .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install Git
+RUN apt-get update && apt-get install -y git && apt-get clean
+
 # Copy the rest of the application code into the container
 COPY . .
 
