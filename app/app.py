@@ -7,6 +7,7 @@ from pymemcache.client import base
 from typing import Optional, Dict, Any
 from werkzeug import Response as WerkzeugResponse
 from datetime import datetime, timedelta
+from git import Repo, GitCommandError
 
 # Suppress the specific warning about in-memory storage for Flask-Limiter
 warnings.filterwarnings(
@@ -33,6 +34,21 @@ _key_cache_time: datetime | None = None
 
 CACHE_TIMEOUT: int = 300  # Cache timeout in seconds
 git_cache: Dict[Any, Any] = {}
+
+
+def get_git_info() -> Dict[str, str]:
+    """
+    Get the short hash and branch name of the current checked-out commit.
+
+    :return: Dictionary containing the short hash and branch name
+    """
+    try:
+        repo = Repo(search_parent_directories=True)
+        commit_hash = repo.git.rev_parse(repo.head.commit.hexsha, short=True)
+        branch_name = repo.active_branch.name
+        return {"commit_hash": commit_hash, "branch_name": branch_name}
+    except GitCommandError:
+        return {"commit_hash": "unknown", "branch_name": "unknown"}
 
 
 def fetch_latest_package_zip(
@@ -174,5 +190,11 @@ def cv() -> Response:
 @app.route(rule="/<path:path>")
 @limiter.limit("10 per minute")
 def catch_all(path: str) -> str:
-    # Render the home page template for any undefined routes
-    return render_template(template_name_or_list="home.j2")
+    # Get the current Git commit hash and branch name
+    git_info = get_git_info()
+    # Render the home page template with the git information
+    return render_template(
+        template_name_or_list="home.j2",
+        commit_hash=git_info["commit_hash"],
+        branch_name=git_info["branch_name"],
+    )
