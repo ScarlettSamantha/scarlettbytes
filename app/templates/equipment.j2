@@ -1,0 +1,243 @@
+{% extends 'base.j2' %}
+
+{% block header %}
+    <h1>Welcome, I am Scarlett</h1>
+    <p>This domain is just a place for me to host some things so this main page is just static.</p>
+{% endblock %}
+
+{% block content %}
+    <div class="equipment-list">
+        <h2>Equipment</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Component</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="8">Computer</td>
+                    <td>OS</td>
+                    <td>KDE 24.04LTS</td>
+                </tr>
+                <tr>
+                    <td>Motherboard</td>
+                    <td>MSI Pro Z790-P WIFI</td>
+                </tr>
+                <tr>
+                    <td>CPU</td>
+                    <td>Intel I5-13600K @ 5.5Ghz</td>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>64GB @ 5333 DDR5 Kingston</td>
+                </tr>
+                <tr>
+                    <td>GPU</td>
+                    <td>AMD RX 7800 XT 16GB GDDR-6</td>
+                </tr>
+                <tr>
+                    <td>Cooler</td>
+                    <td>Noctua D-15 v1</td>
+                </tr>
+                <tr>
+                    <td>NVMe Drives</td>
+                    <td>Samsung 980 1TB, WD-Black SN750 1TB, Samsung 970 Evo Plus 2TB</td>
+                </tr>
+                <tr>
+                    <td>SATA-SSD Drives</td>
+                    <td>Crucial 525GB, Sandisk 240GB, Kingston 240GB</td>
+                </tr>
+                <tr>
+                    <td rowspan="6">Audio/Video</td>
+                    <td>Microphones</td>
+                    <td>
+                        <ul>
+                            <li><a class='no_style' href ="https://samsontech.com/products/microphones/usb-microphones/q9u/">Samson Q9U</a></li>
+                            <li><a class='no_style' href ="https://www.dji.com/nl/mic-2">Dji Mic 2 - Wireless | multimic</a></li>
+                            <li><a class='no_style' href ="https://www.insta360.com/product/insta360-link">Insta360 Link (noise canceling mode)</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Webcam</td>
+                    <td><a class='no_style' href ="https://www.insta360.com/product/insta360-link">Insta360 Link</a></td>
+                </tr>
+                <tr>
+                    <td>DAC</td>
+                    <td><a class='no_style' href ="https://www.fiio.com/k3">Filo K3</a></td>
+                </tr>
+                <tr>
+                    <td>Headsets</td>
+                    <td>
+                        <ul>
+                            <li><a class='no_style' href ="https://www.sennheiser-hearing.com/en-NL/p/momentum-4-wireless/?srsltid=AfmBOorM2KBv4UiLN9u3C99Rfa0CjjuIxZ68KWAG_TdhONOMDrS0HTuI">Sennheiser Momentum 4 Wireless (Bluetooth)</a></li>
+                            <li><a class='no_style' href ="https://global.beyerdynamic.com/dt-900-pro-x.html">Beyerdynamic DT 900 Pro X (Wired)</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Audio ADC</td>
+                    <td><a class='no_style' href ="https://focusrite.com/products/scarlett-solo">Focusrite Scarlett Solo</a></td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Peripherals</td>
+                    <td>Keyboard</td>
+                    <td>Logitech G515 LS TKL</td>
+                </tr>
+                <tr>
+                    <td>Mouse</td>
+                    <td>Logitech G502X Plus Lightspeed + Powerplay mousepad</td>
+                </tr>
+                <tr>
+                    <td rowspan="4">Displays</td>
+                    <td>Screen 1</td>
+                    <td>LG-34UC98 - 34 Inch Ultrawide 3440x1440</td>
+                </tr>
+                <tr>
+                    <td>Screen 2</td>
+                    <td>LG-27UL650-W - 34 Inch 4k 16:9</td>
+                </tr>
+                <tr>
+                    <td>Screen 3</td>
+                    <td>LG-27UL650-W - 34 Inch 4k 16:9</td>
+                </tr>
+                <tr>
+                    <td>Screen 4/Macropad</td>
+                    <td><a class='no_style' href ="https://www.amazon.com/Akntzcs-Touchscreen-1920x1080P-Secondary-Kickstand/dp/B0C4TCHK1S">Akntzcs Touchscreen</a></td>
+                </tr>
+                <tr>
+                    <td rowspan="7">Networking</td>
+                    <td>NIC 1</td>
+                    <td>1Gbit (fallback) -> Office Switch</td>
+                </tr>
+                <tr>
+                    <td>NIC 2</td>
+                    <td>10Gbit (primary) -> Office Switch</td>
+                </tr>
+                <tr>
+                    <td>NIC 3</td>
+                    <td>Wifi 5ghz+2.4ghz @ 1.2Gbit -> Closet AP 1Gbit -> Closet Switch 1Gbit</td>
+                </tr>
+                <tr>
+                    <td>RF</td>
+                    <td>Bluetooth 5.4x2 Transmitter (4 simultaneous devices)</td>
+                </tr>
+                <tr>
+                    <td>Uplink</td>
+                    <td>
+                        <ul>
+                            <li>NIC1/NIC2 -> 10Gbit Mainswitch -> Closet Switch 1Gbit -> 1Gbit WAN Ziggo (static-IP4&IP6)</li>
+                            <li>NIC3 -> Closet AP 1Gbit -> 1Gbit WAN Ziggo (static-IP4&IP6)</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>IP4 - WAN</td>
+                    <td>83.87.207.137 (Ziggo) <strong>Nameserver:</strong> 8.8.8.8</td>
+                </tr>
+                <tr>
+                    <td>IP6 - WAN</td>
+                    <td>2001:1c00:a35:cd00:e69c:8126:3cea:306b (Ziggo)</td>
+                </tr>
+                <tr>
+                    <td rowspan="5">Office</td>
+                    <td>Chair</td>
+                    <td><a class='no_style' href ="https://secretlab.eu/pages/titan-evo-2022-series">SecretLabs 2022 Evo Titan (Pink)</a></td>
+                </tr>
+                <tr>
+                    <td>Desk</td>
+                    <td><a class='no_style' href ="https://www.ikea.com/nl/en/p/utespelare-gaming-desk-black-80507627/">Ikea Utespelare 160x80CM Desk</a></td>
+                </tr>
+                <tr>
+                    <td>Monitor Arms</td>
+                    <td>
+                        <ul>
+                            <li><a class='no_style' href ="https://www.amazon.nl/dp/B0861284GB">Generic Double Arm</a></li>
+                            <li><a class='no_style' href ="https://www.amazon.nl/dp/B09HHBD4PY">Generic Monitor + Laptop Arm</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Glassboard</td>
+                    <td><a class='no_style' href ="https://www.glassboards.nl/whiteboard_glas_clear_white/solid_magnetic/whiteboard_glas_solid_clear_white_100x150_cm.html">Sam International Glassboard white clear 150x100</a></td>
+                </tr>
+                <tr>
+                    <td rowspan="6">Gadgets</td>
+                    <td>Phone</td>
+                    <td>Samsung Galaxy Fold 5</td>
+                </tr>
+                <tr>
+                    <td>Camera</td>
+                    <td>Dji Action 2</td>
+                </tr>
+                <tr>
+                    <td>Mouse</td>
+                    <td>Logitech Mx Master 3</td>
+                </tr>
+                <tr>
+                    <td>Additional Mouse</td>
+                    <td>Logitech Mx Master 1</td>
+                </tr>
+                <tr>
+                    <td>Keyboards</td>
+                    <td>
+                        <ul>
+                            <li>Keyboard 1: Broken spacebar (double reporting, ghosting), Double keys (D key)</li>
+                            <li>Keyboard 2: Ok keyboard issues but ok typing.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="10">NAS/TVPC</td>
+                    <td>OS</td>
+                    <td>Ubuntu Server 22.04LTS, KDE separate frontend/GUI (on-demand)</td>
+                </tr>
+                <tr>
+                    <td>Motherboard</td>
+                    <td>Gigabyte B550M</td>
+                </tr>
+                <tr>
+                    <td>CPU</td>
+                    <td>AMD Ryzen 5-4600G @ 4.3GHz</td>
+                </tr>
+                <tr>
+                    <td>RAM</td>
+                    <td>32GB @ 3200 DDR4 Kingston</td>
+                </tr>
+                <tr>
+                    <td>GPU</td>
+                    <td>Nvidia 1080TI Founders Edition</td>
+                </tr>
+                <tr>
+                    <td>Cooler</td>
+                    <td>Noctua NH-L12Sx77</td>
+                </tr>
+                <tr>
+                    <td>NVMe Drives</td>
+                    <td>PNY CS1030 1TB, WD-Black SN750 1TB</td>
+                </tr>
+                <tr>
+                    <td>SATA-HDD</td>
+                    <td>8TB WD x2, 4TB (Inactive) x2</td>
+                </tr>
+                <tr>
+                    <td>SATA-SSD</td>
+                    <td>AData SU800 256GB</td>
+                </tr>
+                <tr>
+                    <td>Mic</td>
+                    <td>Generic Mic</td>
+                </tr>
+                <tr>
+                    <td>Webcam</td>
+                    <td>Logitech C925e</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <p>Please note: I do not appreciate unsolicited contact from bots or external recruiters. For legitimate inquiries, you can find my email via WHOIS: <a class='no_style' href ="https://www.sidn.nl/whois?q=scarlettbytes.nl" target="_blank">Whois☍</a></p>
+{% endblock %}

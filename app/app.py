@@ -194,7 +194,6 @@ def cv() -> Response:
 @app.route(rule="/<path:path>")
 @limiter.limit("10 per minute")
 def catch_all(path: str) -> str:
-    print("test")
     # Get the current Git commit hash and branch name
     git_info = get_git_info(
         author="ScarlettSamantha", repo="repository-name"
@@ -202,6 +201,21 @@ def catch_all(path: str) -> str:
     # Render the home page template with the git information
     return render_template(
         template_name_or_list="home.j2",
+        commit_hash=git_info["commit_hash"],
+        branch_name=git_info["branch_name"],
+    )
+
+
+@app.route(rule="/equipment", methods=["GET"])
+@limiter.limit("10 per minute")
+def equipment() -> str:
+    # Get the current Git commit hash and branch name
+    git_info = get_git_info(
+        author="ScarlettSamantha", repo="repository-name"
+    )  # Replace 'repository-name' with your actual repo name
+    # Render the home page template with the git information
+    return render_template(
+        template_name_or_list="equipment.j2",
         commit_hash=git_info["commit_hash"],
         branch_name=git_info["branch_name"],
     )

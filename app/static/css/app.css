@@ -7,7 +7,7 @@ body {
     background: radial-gradient(circle, #260030, #000000);
     background-size: 200% 200%;
     animation: radiateAnimation 10s ease infinite, waveAnimation 20s linear infinite;
-    overflow: hidden; /* Ensures the body takes the full screen for the effect */
+    overflow: auto; /* Ensures the body takes the full screen for the effect */
 }
 
 @keyframes radiateAnimation {
@@ -91,4 +91,65 @@ ul li a:not(.no_style) {
 ul li a:hover {
     background-color: #1E90FF;
     color: #fff;
+}
+
+.equipment-list h2 {
+    color: #1E90FF;
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.equipment-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.equipment-list th, .equipment-list td {
+    border: 1px solid #444;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.equipment-list th {
+    background-color: #333;
+    color: #1E90FF;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.equipment-list td {
+    color: #ddd;
+}
+
+.equipment-list tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.equipment-list tbody tr:nth-child(odd) {
+    background-color: #282828;
+}
+
+.equipment-list tbody tr:nth-child(even) {
+    background-color: #222;
+}
+
+.equipment-list tbody tr:hover {
+    background-color: #3c3c3c;
+}
+
+.equipment-list a {
+    color: #1E90FF;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.equipment-list a:hover {
+    color: #fff;
+    text-decoration: none;
 }
