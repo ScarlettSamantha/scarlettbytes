@@ -194,6 +194,7 @@ def cv() -> Response:
 @app.route(rule="/<path:path>")
 @limiter.limit("10 per minute")
 def catch_all(path: str) -> str:
+    print("test")
     # Get the current Git commit hash and branch name
     git_info = get_git_info(
         author="ScarlettSamantha", repo="repository-name"

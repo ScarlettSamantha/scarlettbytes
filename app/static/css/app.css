@@ -1,0 +1,94 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #ddd;
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle, #260030, #000000);
+    background-size: 200% 200%;
+    animation: radiateAnimation 10s ease infinite, waveAnimation 20s linear infinite;
+    overflow: hidden; /* Ensures the body takes the full screen for the effect */
+}
+
+@keyframes radiateAnimation {
+    0% {
+        background-position: 50% 50%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 50% 50%;
+    }
+}
+
+@keyframes waveAnimation {
+    0% {
+        background-size: 200% 200%, 50% 50%;
+    }
+    50% {
+        background-size: 150% 150%, 100% 100%;
+    }
+    100% {
+        background-size: 200% 200%, 50% 50%;
+    }
+}
+
+a {
+    color: #1E90FF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(20, 20, 20, 0.9);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+}
+
+.header, .footer {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.header {
+    border-bottom: 2px solid #1E90FF;
+}
+
+.content {
+    padding: 20px 0;
+}
+
+.footer {
+    border-top: 2px solid #1E90FF;
+    font-size: 0.9em;
+    color: #999;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;
+}
+
+ul li a:not(.no_style) {
+    display: inline-block;
+    padding: 10px 15px;
+    border: 1px solid #1E90FF;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+ul li a:hover {
+    background-color: #1E90FF;
+    color: #fff;
+}
