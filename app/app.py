@@ -1,5 +1,5 @@
 import warnings
-from flask import Flask, Response, send_file, render_template, redirect
+from flask import Flask, Response, send_file, render_template, redirect, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import requests
@@ -7,6 +7,7 @@ from pymemcache.client import base
 from typing import Optional, Dict, Any
 from werkzeug import Response as WerkzeugResponse
 from datetime import datetime, timedelta
+import re
 
 # Suppress the specific warning about in-memory storage for Flask-Limiter
 warnings.filterwarnings(
@@ -28,8 +29,8 @@ limiter = Limiter(
 mc = base.Client(server=("memcached", 11211))
 
 # Cache for the GPG key and the time it was last updated
-_key_cache: str | None = None
-_key_cache_time: datetime | None = None
+_key_cache: Optional[str] = None
+_key_cache_time: Optional[datetime] = None
 
 CACHE_TIMEOUT: int = 300  # Cache timeout in seconds
 git_cache: Dict[Any, Any] = {}
@@ -71,8 +72,10 @@ def fetch_latest_package_zip(
     # Check cache first
     if not bypass_cache and cache_key in git_cache:
         cached_entry: Any = git_cache[cache_key]
-        if datetime.now() - cached_entry["timestamp"] < CACHE_TIMEOUT:
-            return cached_entry["zip_url"] + {"cached": True}
+        if datetime.now() - cached_entry["timestamp"] < timedelta(
+            seconds=CACHE_TIMEOUT
+        ):
+            return cached_entry["zip_url"]
 
     # GitHub API URL to get the latest release information
     api_url: str = f"https://api.github.com/repos/{author}/{package}/releases/latest"
@@ -122,7 +125,7 @@ def lshw_parser() -> WerkzeugResponse:
 @app.route(rule="/lshw-parser/download", methods=["GET"])
 @limiter.limit(limit_value="5 per minute")
 def lshw_parser_download() -> WerkzeugResponse:
-    zip_url: str | None = fetch_latest_package_zip(
+    zip_url: Optional[str] = fetch_latest_package_zip(
         author="ScarlettSamantha", package="lshw-parser"
     )
 
@@ -145,7 +148,7 @@ def openciv() -> WerkzeugResponse:
 @app.route(rule="/openciv/download", methods=["GET"])
 @limiter.limit(limit_value="5 per minute")
 def openciv_download() -> WerkzeugResponse:
-    zip_url: str | None = fetch_latest_package_zip(
+    zip_url: Optional[str] = fetch_latest_package_zip(
         author="ScarlettSamantha", package="OpenCiv"
     )
 
@@ -192,12 +195,12 @@ def cv() -> Response:
 
 @app.route(rule="/", defaults={"path": ""})
 @app.route(rule="/<path:path>")
-@limiter.limit("10 per minute")
+@limiter.limit(limit_value="10 per minute")
 def catch_all(path: str) -> str:
     # Get the current Git commit hash and branch name
-    git_info = get_git_info(
-        author="ScarlettSamantha", repo="repository-name"
-    )  # Replace 'repository-name' with your actual repo name
+    git_info: Dict[str, str] = get_git_info(
+        author="ScarlettSamantha", repo="scarlettbytes"
+    )
     # Render the home page template with the git information
     return render_template(
         template_name_or_list="home.j2",
@@ -210,12 +213,56 @@ def catch_all(path: str) -> str:
 @limiter.limit("10 per minute")
 def equipment() -> str:
     # Get the current Git commit hash and branch name
-    git_info = get_git_info(
-        author="ScarlettSamantha", repo="repository-name"
-    )  # Replace 'repository-name' with your actual repo name
-    # Render the home page template with the git information
+    git_info = get_git_info(author="ScarlettSamantha", repo="scarlettbytes")
+    # Render the equipment page template with the git information
     return render_template(
         template_name_or_list="equipment.j2",
         commit_hash=git_info["commit_hash"],
         branch_name=git_info["branch_name"],
     )
+
+
+@app.route(rule="/datetime", methods=["GET"])
+@limiter.limit(limit_value="10 per minute")
+def datetime_endpoint() -> Response | str:
+    """
+    Endpoint to display the current datetime.
+    Allows the user to specify the datetime format via a URL parameter.
+    If 'live' parameter is true, uses JavaScript to update it.
+    Allows specifying the update interval via the 'interval' parameter.
+    """
+    # Default datetime format
+    default_format = "%Y-%m-%d %H:%M:%S"
+
+    # Get parameters from the URL
+    format_str: str = request.args.get(key="format", default=default_format)
+    live: bool = request.args.get(key="live", default="false").lower() == "true"
+    interval_str: str = request.args.get(
+        key="interval", default="1000"
+    )  # Default interval 1000ms
+
+    # Sanitize the format string to prevent security issues
+    if not re.match(pattern=r"^[%A-Za-z0-9\s\-\:\./]+$", string=format_str):
+        return Response(response="Invalid format string.", status=400)
+
+    # Validate and sanitize the interval
+    if not interval_str.isdigit() or int(interval_str) <= 0:
+        return Response(response="Invalid interval.", status=400)
+    interval = int(interval_str)
+
+    try:
+        # Get the current datetime
+        now: datetime = datetime.now()
+        formatted_datetime: str = now.strftime(format=format_str)
+
+        # Render the template
+        return render_template(
+            template_name_or_list="datetime.j2",
+            live=live,
+            format_str=format_str,
+            interval=interval,
+            formatted_datetime=formatted_datetime,
+        )
+    except Exception:
+        # Handle any exceptions during formatting
+        return Response(response="Error formatting datetime.", status=500)

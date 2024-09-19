@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Datetime</title>
+    {% if live %}
+    <!-- Include moment.js, moment-timezone, and moment-strftime -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.40/moment-timezone-with-data.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment-strftime@0.5.0/lib/moment-strftime.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">
+        function updateTime() {
+            var timezone = "{{ timezone|e }}";
+            if (timezone.toLowerCase() === 'auto') {
+                timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+            }
+            var now = moment().tz(timezone);
+            var formattedDate = moment().strftime("{{ format_str|e }}");
+            document.getElementById("datetime").textContent = formattedDate;
+        }
+        setInterval(updateTime, {{ interval }});
+        window.onload = updateTime;
+    </script>
+    {% endif %}
+</head>
+<body>
+    <div id="datetime">{{ formatted_datetime }}</div>
+</body>
+</html>
