@@ -1,3 +1,4 @@
+import keyword
 import warnings
 from flask import Flask, Response, send_file, render_template, redirect, request
 from flask_limiter import Limiter
@@ -193,10 +194,80 @@ def cv() -> Response:
     )
 
 
+@app.route(rule="/about", methods=["GET"])
+@limiter.limit(limit_value="100 per minute")
+def about() -> str:
+    import pathlib
+    import markdown2
+    from typing import Dict
+
+    # Get the current Git commit hash and branch name
+    git_info: Dict[str, str] = get_git_info(
+        author="ScarlettSamantha", repo="scarlettbytes"
+    )
+
+    # Construct the path to the README.md file relative to this file's directory.
+    base_path: pathlib.Path = pathlib.Path(__file__).parent
+    readme_path: pathlib.Path = base_path / "files" / "README.md"
+    # Read the markdown content from the README file using UTF-8 encoding.
+    markdown_raw: str = readme_path.read_text(encoding="utf-8")
+    # Convert markdown to HTML.
+    content: str = markdown2.markdown(markdown_raw)
+
+    print(content)
+
+    # Render the home page template with the git information and markdown content.
+    return render_template(
+        template_name_or_list="about.j2",
+        commit_hash=git_info["commit_hash"],
+        branch_name=git_info["branch_name"],
+        page="about",
+        content=str(content),
+    )
+
+
 @app.route(rule="/", defaults={"path": ""})
 @app.route(rule="/<path:path>")
-@limiter.limit(limit_value="10 per minute")
+@limiter.limit(limit_value="100 per minute")
 def catch_all(path: str) -> str:
+    # Get the current Git commit hash and branch name
+    git_info: Dict[str, str] = get_git_info(
+        author="ScarlettSamantha", repo="scarlettbytes"
+    )
+    description: str = "I am scarlett a software engieneer, focusing on SaaS and Server based computer with some other stuff."
+    # Render the home page template with the git information
+    return render_template(
+        template_name_or_list="home.j2",
+        commit_hash=git_info["commit_hash"],
+        branch_name=git_info["branch_name"],
+        page="home",
+        description=description,
+        og_title="Scarlett Verheul - Software Engineer",
+        og_description=description,
+        author="Scarlett Samantha Verheul",
+        og_url="https://scarlettbytes.com",
+        keyword=",".join(
+            [
+                "Scarlett Verheul",
+                "Software Engineer",
+                "Scarlett",
+                "Samantha",
+                "Verheul",
+                "PHP",
+                "Python",
+                "SaaS",
+                "Vacature",
+                "Rotterdam",
+                "Netherlands",
+                "Nederland",
+            ]
+        ),
+    )
+
+
+@app.route(rule="/contact")
+@limiter.limit(limit_value="100 per minute")
+def contact(path: str) -> str:
     # Get the current Git commit hash and branch name
     git_info: Dict[str, str] = get_git_info(
         author="ScarlettSamantha", repo="scarlettbytes"
@@ -206,6 +277,7 @@ def catch_all(path: str) -> str:
         template_name_or_list="home.j2",
         commit_hash=git_info["commit_hash"],
         branch_name=git_info["branch_name"],
+        page="contact",
     )
 
 
@@ -266,3 +338,7 @@ def datetime_endpoint() -> Response | str:
     except Exception:
         # Handle any exceptions during formatting
         return Response(response="Error formatting datetime.", status=500)
+
+
+if __name__ == "__main__":
+    app.run("127.0.0.1", 5000, True, True)

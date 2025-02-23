@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,21 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ og_url }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-    <script defer src="https://umami.scarlettbytes.nl/script.js" data-website-id="16b46f03-2d4b-409b-99ea-187f1c7f08f5"></script>
+    <script defer src="https://umami.scarlettbytes.nl/script.js"
+        data-website-id="16b46f03-2d4b-409b-99ea-187f1c7f08f5"></script>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
+
 <body>
-    <div class="container">
-        {% include '_header.j2' %}
-        
-        <div class="content">
-            {% block content %}{% endblock %}
+    <div class="max-w-full">
+        <div class="w-full">
+            {% include '_menu.j2' %}
+            <div class="w-full">
+                {% block content %}{% endblock %}
+            </div>
         </div>
-        
         {% include '_footer.j2' %}
     </div>
 </body>
+
 </html>

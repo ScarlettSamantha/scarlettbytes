@@ -5,3 +5,4 @@ flask_limiter
 limits
 pymemcache
 gitpython
+markdown2[all]
