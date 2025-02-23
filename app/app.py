@@ -201,11 +201,39 @@ def catch_all(path: str) -> str:
     git_info: Dict[str, str] = get_git_info(
         author="ScarlettSamantha", repo="scarlettbytes"
     )
+    description: str = "Scarlett Samantha Verheul is a Software Developer from Rotterdam, Netherlands. I specialize in Python, Flask, Docker, DevOps, Linux, and Open Source."
     # Render the home page template with the git information
     return render_template(
         template_name_or_list="home.j2",
         commit_hash=git_info["commit_hash"],
         branch_name=git_info["branch_name"],
+        author="Scarlett Samantha Verheul",
+        keywords=",".join(
+            [
+                "Scarlett Samantha Verheul",
+                "ScarlettSamantha",
+                "Scarlett",
+                "Software Developer",
+                "Python",
+                "Flask",
+                "Docker",
+                "DevOps",
+                "Linux",
+                "Open Source",
+                "Rotterdam",
+                "Netherlands",
+                "Vacancies",
+                "Jobs",
+                "Hiring",
+                "PHP",
+                "Laravel",
+                "Symfony",
+            ]
+        ),
+        description=description,
+        og_title="Scarlett Samantha Verheul - Software Developer",
+        og_description=description,
+        og_url=request.url_root,
     )
 
 
