@@ -5,3 +5,6 @@ google-api-python-client
 PyPDF2 
 python-gnupg
 gunicorn
+flask
+flask_limiter
+pymemcache
