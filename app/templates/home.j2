@@ -1,22 +1,25 @@
 {% extends 'base.j2' %}
 
 {% block header %}
-    <h1>Welcome, I am Scarlett</h1>
-    <p>This domain is just a place for me to host some things so this main page is just static.</p>
+<h1>Welcome, I am Scarlett</h1>
+<p>This domain is just a place for me to host some things so this main page is just static.</p>
 {% endblock %}
 
 {% block content %}
-    <ul>
-        <li><a target="_blank" href="{{ url_for('gpg') }}">GPG Public Key</a></li>
-        <li>
-            <a target="_blank" href="{{ url_for('cv') }}">Curriculum Vitae (CV)</a>
-            [<a class="no_style" href="{{ url_for('cv_download') }}">File</a>]
-            | [<a class="no_style" href="{{ url_for('cv_download_key') }}">Key</a>]
-        </li>
-        <li><a target="_blank" href="https://github.com/ScarlettSamantha">GitHub Profile☍</a></li>
-        <li><a target="_blank" href="{{ url_for('lshw_parser') }}">lshw-parser Project☍</a> [<a class="no_style" target="_blank" href="{{ url_for('lshw_parser_download') }}">latest zip☍</a>]</li>
-        <li><a target="_blank" href="{{ url_for('lshw_parser_download') }}">OpenCiv Project☍</a> [<a class="no_style" target="_blank" href="{{ url_for('openciv_download') }}">latest zip☍</a>]</li>
-        <li><a target="_blank" href="https://todo.arcane-tech.nl">Personal Todo(🔒)</a></li>
-    </ul>
-    <p>Please note: I do not appreciate unsolicited contact from bots or external recruiters. For legitimate inquiries, you can find my email via WHOIS: <a href="https://www.sidn.nl/whois?q=scarlettbytes.nl" target="_blank">Whois☍</a></p>
+<ul>
+    <li><a target="_blank" href="{{ url_for('gpg') }}">GPG Public Key</a></li>
+    <li>
+        <a target="_blank" href="{{ url_for('cv') }}">Curriculum Vitae (CV)</a>
+        [<a class="no_style" href="{{ url_for('cv_download') }}">File</a>]
+        | [<a class="no_style" href="{{ url_for('cv_download_key') }}">Key</a>]
+    </li>
+    <li><a target="_blank" href="https://github.com/ScarlettSamantha">GitHub Profile☍</a></li>
+    <li><a target="_blank" href="{{ url_for('lshw_parser') }}">lshw-parser Project☍</a> [<a class="no_style"
+            target="_blank" href="{{ url_for('lshw_parser_download') }}">latest zip☍</a>]</li>
+    <li><a target="_blank" href="{{ url_for('openciv') }}">OpenCiv Project☍</a> [<a class="no_style" target="_blank"
+            href="{{ url_for('openciv_download') }}">latest zip☍</a>]</li>
+    <li><a target="_blank" href="https://todo.arcane-tech.nl">Personal Todo(🔒)</a></li>
+</ul>
+<p>Please note: I do not appreciate unsolicited contact from bots or external recruiters. For legitimate inquiries, you
+    can find my email via WHOIS: <a href="https://www.sidn.nl/whois?q=scarlettbytes.nl" target="_blank">Whois☍</a></p>
 {% endblock %}

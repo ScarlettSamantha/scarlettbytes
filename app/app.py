@@ -142,7 +142,9 @@ def lshw_parser_download() -> WerkzeugResponse:
 @app.route(rule="/openciv", methods=["GET"])
 @limiter.limit(limit_value="5 per minute")
 def openciv() -> WerkzeugResponse:
-    return redirect(location="https://github.com/ScarlettSamantha/OpenCiv", code=301)
+    return redirect(
+        location="https://git.scarlettbytes.nl/scarlett/panda-openciv", code=301
+    )
 
 
 @app.route(rule="/openciv/download", methods=["GET"])
