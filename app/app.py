@@ -9,7 +9,6 @@ from werkzeug import Response as WerkzeugResponse
 from datetime import datetime, timedelta
 import re
 
-# Suppress the specific warning about in-memory storage for Flask-Limiter
 warnings.filterwarnings(
     "ignore",
     message="Using the in-memory storage for tracking rate limits as no storage was explicitly specified",
@@ -17,7 +16,6 @@ warnings.filterwarnings(
 
 app = Flask(import_name=__name__)
 
-# Initialize Flask-Limiter with Memcached storage
 limiter = Limiter(
     key_func=get_remote_address,
     storage_uri="memcached://memcached:11211",
@@ -25,7 +23,7 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"],
 )
 
-# Configure Memcached client
+
 mc = base.Client(server=("memcached", 11211))
 
 # Cache for the GPG key and the time it was last updated
@@ -37,13 +35,6 @@ git_cache: Dict[Any, Any] = {}
 
 
 def get_git_info(author: str, repo: str) -> Dict[str, str]:
-    """
-    Get the short hash and branch name of the latest commit from the GitHub repository.
-
-    :param author: The author of the repository
-    :param repo: The name of the repository
-    :return: Dictionary containing the short hash and branch name
-    """
     api_url = f"https://api.github.com/repos/{author}/{repo}/commits"
     response = requests.get(api_url)
 
@@ -59,17 +50,8 @@ def get_git_info(author: str, repo: str) -> Dict[str, str]:
 def fetch_latest_package_zip(
     author: str, package: str, bypass_cache: bool = False
 ) -> Optional[str]:
-    """
-    Fetch the latest release zip URL for a given GitHub repository.
-
-    :param author: The author of the repository
-    :param package: The name of the repository
-    :param bypass_cache: Whether to bypass the cache and fetch fresh data
-    :return: The URL of the latest release zip file, or None if not found
-    """
     cache_key: str = f"{author}/{package}"
 
-    # Check cache first
     if not bypass_cache and cache_key in git_cache:
         cached_entry: Any = git_cache[cache_key]
         if datetime.now() - cached_entry["timestamp"] < timedelta(
@@ -77,18 +59,14 @@ def fetch_latest_package_zip(
         ):
             return cached_entry["zip_url"]
 
-    # GitHub API URL to get the latest release information
     api_url: str = f"https://api.github.com/repos/{author}/{package}/releases/latest"
 
-    # Make a GET request to the GitHub API
     response: requests.Response = requests.get(url=api_url)
 
     if response.status_code == 200:
-        # Parse the JSON response to get the zipball_url
         latest_release: Any = response.json()
         zip_url: Any = latest_release.get("zipball_url")
 
-        # Update cache
         git_cache[cache_key] = {"zip_url": zip_url, "timestamp": datetime.now()}
 
         return zip_url
@@ -101,16 +79,12 @@ def fetch_latest_package_zip(
 @limiter.limit(limit_value="10 per minute")
 def gpg() -> Response:
     global _key_cache, _key_cache_time
-    # Check if the cache is empty or older than an hour
     if _key_cache is None or (
         _key_cache_time and (datetime.now() - _key_cache_time) > timedelta(hours=1)
     ):
-        # Read the public key from the file
         with open(file="files/public_key.asc", mode="r") as f:
             _key_cache = f.read()
-        # Update the cache time
         _key_cache_time = datetime.now()
-    # Return the key in a preformatted HTML response
     return Response(response=f"<pre>{_key_cache}</pre>", mimetype="text/html")
 
 
@@ -164,10 +138,34 @@ def openciv_download() -> WerkzeugResponse:
         )
 
 
+@app.route(rule="/json-inspector", methods=["GET"])
+@limiter.limit(limit_value="10 per minute")
+def json_inspector() -> WerkzeugResponse:
+    return redirect(
+        location="https://git.scarlettbytes.nl/scarlett/json-inspector", code=301
+    )
+
+
+@app.route(rule="/json-inspector/download", methods=["GET"])
+@limiter.limit(limit_value="10 per minute")
+def json_inspector_download() -> WerkzeugResponse:
+    zip_url: Optional[str] = fetch_latest_package_zip(
+        author="ScarlettSamantha", package="json_inspector"
+    )
+
+    if zip_url:
+        return redirect(location=zip_url)
+    else:
+        return Response(
+            response='{"error": "Unable to find the latest release zip URL."}',
+            status=404,
+            mimetype="application/json",
+        )
+
+
 @app.route(rule="/cv/download", methods=["GET"])
 @limiter.limit(limit_value="10 per minute")
 def cv_download() -> Response:
-    # Serve the CV PDF file and force it to download
     return send_file(
         path_or_file="files/scarlett_verheul_cv.pdf",
         mimetype="application/pdf",
@@ -178,7 +176,6 @@ def cv_download() -> Response:
 @app.route(rule="/cv/download/key", methods=["GET"])
 @limiter.limit(limit_value="10 per minute")
 def cv_download_key() -> Response:
-    # Serve the PGP signature for the CV and force it to download
     return send_file(
         path_or_file="files/cv.pdf.sig",
         mimetype="application/pgp-signature",
@@ -189,7 +186,6 @@ def cv_download_key() -> Response:
 @app.route(rule="/cv", methods=["GET"])
 @limiter.limit(limit_value="10 per minute")
 def cv() -> Response:
-    # Serve the CV PDF file
     return send_file(
         path_or_file="files/scarlett_verheul_cv.pdf", mimetype="application/pdf"
     )
@@ -199,12 +195,11 @@ def cv() -> Response:
 @app.route(rule="/<path:path>")
 @limiter.limit(limit_value="10 per minute")
 def catch_all(path: str) -> str:
-    # Get the current Git commit hash and branch name
     git_info: Dict[str, str] = get_git_info(
         author="ScarlettSamantha", repo="scarlettbytes"
     )
     description: str = "Scarlett Samantha Verheul is a Software Developer from Rotterdam, Netherlands. I specialize in Python, Flask, Docker, DevOps, Linux, and Open Source."
-    # Render the home page template with the git information
+
     return render_template(
         template_name_or_list="home.j2",
         commit_hash=git_info["commit_hash"],
@@ -242,9 +237,9 @@ def catch_all(path: str) -> str:
 @app.route(rule="/equipment", methods=["GET"])
 @limiter.limit("10 per minute")
 def equipment() -> str:
-    # Get the current Git commit hash and branch name
-    git_info = get_git_info(author="ScarlettSamantha", repo="scarlettbytes")
-    # Render the equipment page template with the git information
+    git_info: Dict[str, str] = get_git_info(
+        author="ScarlettSamantha", repo="scarlettbytes"
+    )
     return render_template(
         template_name_or_list="equipment.j2",
         commit_hash=git_info["commit_hash"],
@@ -255,37 +250,25 @@ def equipment() -> str:
 @app.route(rule="/datetime", methods=["GET"])
 @limiter.limit(limit_value="10 per minute")
 def datetime_endpoint() -> Response | str:
-    """
-    Endpoint to display the current datetime.
-    Allows the user to specify the datetime format via a URL parameter.
-    If 'live' parameter is true, uses JavaScript to update it.
-    Allows specifying the update interval via the 'interval' parameter.
-    """
-    # Default datetime format
     default_format = "%Y-%m-%d %H:%M:%S"
 
-    # Get parameters from the URL
     format_str: str = request.args.get(key="format", default=default_format)
     live: bool = request.args.get(key="live", default="false").lower() == "true"
     interval_str: str = request.args.get(
         key="interval", default="1000"
     )  # Default interval 1000ms
 
-    # Sanitize the format string to prevent security issues
     if not re.match(pattern=r"^[%A-Za-z0-9\s\-\:\./]+$", string=format_str):
         return Response(response="Invalid format string.", status=400)
 
-    # Validate and sanitize the interval
     if not interval_str.isdigit() or int(interval_str) <= 0:
         return Response(response="Invalid interval.", status=400)
     interval = int(interval_str)
 
     try:
-        # Get the current datetime
         now: datetime = datetime.now()
         formatted_datetime: str = now.strftime(format=format_str)
 
-        # Render the template
         return render_template(
             template_name_or_list="datetime.j2",
             live=live,
@@ -294,5 +277,4 @@ def datetime_endpoint() -> Response | str:
             formatted_datetime=formatted_datetime,
         )
     except Exception:
-        # Handle any exceptions during formatting
         return Response(response="Error formatting datetime.", status=500)
