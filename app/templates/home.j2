@@ -1,29 +1,118 @@
 {% extends 'base.j2' %}
 
 {% block header %}
-<h1>Welcome, I am Scarlett</h1>
-<p>This domain is just a place for me to host some things so this main page is just static.</p>
+<section class="hero">
+    <div class="hero-layout">
+        <div class="hero-text">
+            <p class="eyebrow">Hi, I’m Scarlett</p>
+            <h1 class="hero-title">Senior backend engineer and open-source nerd.</h1>
+            <p class="hero-subtitle">
+                I build backend systems, infra and weird little tools.
+                Mostly Python, PHP, Linux and a borderline unhealthy love for automation.
+            </p>
+            <div class="hero-chips">
+                <span class="chip">Rotterdam area, NL</span>
+                <span class="chip">Python · Flask · DevOps</span>
+                <span class="chip">PHP 8.3 · Symfony/Laravel</span>
+            </div>
+        </div>
+
+        <div class="hero-aside">
+            <div class="hero-card">
+                <h2 class="hero-card-title">Currently hacking on</h2>
+                <ul class="bullet-list">
+                    <li>OpenCiv – a Civ-like built with Panda3D and Kivy.</li>
+                    <li>Rendition Server – a high-throughput image rendition backend.</li>
+                    <li>Small utilities that keep my machines and myself organised.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
 
 {% block content %}
-<ul>
-    <li><a target="_blank" href="{{ url_for('gpg') }}">GPG Public Key</a></li>
-    <li>
-        <a target="_blank" href="{{ url_for('cv') }}">Curriculum Vitae (CV)</a>
-        [<a class="no_style" href="{{ url_for('cv_download') }}">File</a>]
-        | [<a class="no_style" href="{{ url_for('cv_download_key') }}">Key</a>]
-    </li>
-    <li><a target="_blank" href="https://github.com/ScarlettSamantha">GitHub Profile☍</a> <a target="_blank"
-            href="https://git.scarlettbytes.nl/scarlett">GitLab Profile☍</a></li>
-</ul>
-<ul>
-    <li><a target="_blank" href="{{ url_for('lshw_parser') }}">lshw-parser Project☍</a> [<a class="no_style"
-            target="_blank" href="{{ url_for('lshw_parser_download') }}">latest zip☍</a>]</li>
-    <li><a target="_blank" href="{{ url_for('openciv') }}">OpenCiv Project☍</a> [<a class="no_style" target="_blank"
-            href="{{ url_for('openciv_download') }}">latest zip☍</a>]</li>
-    <li><a target="_blank" href="{{ url_for('json_inspector') }}">Json Inspector☍</a> [<a class="no_style"
-            target="_blank" href="{{ url_for('json_inspector_download') }}">latest zip☍</a>]</li>
-</ul>
-<p>Please note: I do not appreciate unsolicited contact from bots or external recruiters. For legitimate inquiries, you
-    can find my email via WHOIS: <a href="https://www.sidn.nl/whois?q=scarlettbytes.nl" target="_blank">Whois☍</a></p>
+<div class="cards-grid">
+    <section class="card">
+        <h2 class="card-title">Identity & docs</h2>
+        <ul class="link-list">
+            <li class="link-row">
+                <a class="link-primary" target="_blank" href="{{ url_for('gpg') }}">GPG public key</a>
+            </li>
+            <li class="link-row">
+                <a class="link-primary" target="_blank" href="{{ url_for('cv') }}">Curriculum Vitae (CV)</a>
+                <span class="link-meta">
+                    <a class="link-pill" href="{{ url_for('cv_download') }}">file</a>
+                    <a class="link-pill" href="{{ url_for('cv_download_key') }}">signature</a>
+                </span>
+            </li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2 class="card-title">Projects & tools</h2>
+        <ul class="link-list">
+            <li class="link-row">
+                <a class="link-primary" target="_blank" href="{{ url_for('lshw_parser') }}">lshw-parser</a>
+                <span class="link-meta">
+                    <a class="link-pill" target="_blank" href="{{ url_for('lshw_parser_download') }}">
+                        latest zip
+                    </a>
+                </span>
+            </li>
+            <li class="link-row">
+                <a class="link-primary" target="_blank" href="{{ url_for('openciv') }}">OpenCiv</a>
+                <span class="link-meta">
+                    <a class="link-pill" target="_blank" href="{{ url_for('openciv_download') }}">
+                        latest zip
+                    </a>
+                </span>
+            </li>
+            <li class="link-row">
+                <a class="link-primary" target="_blank" href="{{ url_for('json_inspector') }}">Json Inspector</a>
+                <span class="link-meta">
+                    <a class="link-pill" target="_blank" href="{{ url_for('json_inspector_download') }}">
+                        latest zip
+                    </a>
+                </span>
+            </li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2 class="card-title">Latest commits</h2>
+        <ul class="commit-list">
+            {% for commit in recent_commits %}
+            <li class="commit-row">
+                <a class="commit-message" href="{{ commit.url }}" target="_blank" rel="noreferrer">
+                    {{ commit.message }}
+                </a>
+                <span class="commit-meta mono">
+                    {{ commit.sha }} · {{ commit.date }}
+                </span>
+            </li>
+            {% else %}
+            <li class="commit-row">
+                <span class="commit-meta">Unable to load recent commits right now.</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="card card-accent">
+        <h2 class="card-title">Contact boundaries</h2>
+        <p class="card-text">
+            I do not appreciate unsolicited contact from bots or external recruiters.
+        </p>
+        <p class="card-text">
+            For legitimate inquiries you can find my email via WHOIS:
+            <a class="link-inline" href="https://www.sidn.nl/whois?q=scarlettbytes.nl" target="_blank">
+                Whois☍
+            </a>.
+        </p>
+        <p class="card-text">
+            Please be a human, be specific, and skip the generic “exciting opportunity” templates.
+        </p>
+    </section>
+</div>
 {% endblock %}

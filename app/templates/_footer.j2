@@ -1,6 +1,27 @@
-<div class="footer">
-    <p>With 💜, Scarlett from the Netherlands 🇳🇱🇪🇺</p>
-    <p>Powered by Flask⚗️ and Python🐍 [<a target="_blank" href="https://github.com/ScarlettSamantha/scarlettbytes">Source☍</a>]</p>
-    <p>Current commit: {{ commit_hash }} on branch {{ branch_name }}</p>
-    <p>This site respects your privacy: no tracking, no cookies🔒. Please be aware that ☍ links lead to external domains, which may have their own tracking policies.</p>
-</div>
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <div class="footer-left">
+            <p class="footer-text-main">With 💜, Scarlett from the Netherlands 🇳🇱🇪🇺</p>
+            <p class="footer-text-sub">
+                This site respects your privacy: no tracking, no cookies.
+                ☍ links point to external domains with their own policies.
+            </p>
+        </div>
+        <div class="footer-right">
+            <p class="footer-meta">
+                Powered by Flask⚗️ and Python🐍
+                [
+                <a target="_blank" rel="noreferrer" href="https://github.com/ScarlettSamantha/scarlettbytes">
+                    Source☍
+                </a>
+                ]
+            </p>
+            <p class="footer-meta">
+                Current commit:
+                <span class="mono">{{ commit_hash }}</span>
+                on branch
+                <span class="mono">{{ branch_name }}</span>
+            </p>
+        </div>
+    </div>
+</footer>

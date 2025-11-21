@@ -2,3 +2,4 @@ update_repo.log
 *.log
 __pycache__
 *.pyc
+.env

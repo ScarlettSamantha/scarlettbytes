@@ -11,18 +11,72 @@
     <meta property="og:description" content="{{ og_description }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ og_url }}">
+
+    <!-- Set theme before CSS loads (defaults to dark) -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('sb-theme');
+                var theme = (stored === 'light' || stored === 'dark') ? stored : 'dark';
+                document.documentElement.dataset.theme = theme;
+            } catch (e) {
+                document.documentElement.dataset.theme = 'dark';
+            }
+        })();
+    </script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-    <script defer src="https://umami.arcane-tech.nl/script.js" data-website-id="16b46f03-2d4b-409b-99ea-187f1c7f08f5"></script>
+    <script defer src="https://umami.arcane-tech.nl/script.js"
+        data-website-id="16b46f03-2d4b-409b-99ea-187f1c7f08f5"></script>
 </head>
+
 <body>
-    <div class="container">
+    <div class="shell">
         {% include '_header.j2' %}
-        
-        <div class="content">
-            {% block content %}{% endblock %}
-        </div>
-        
+
+        <main class="site-main">
+            <div class="container content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
         {% include '_footer.j2' %}
     </div>
+
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var btn = document.getElementById('theme-toggle');
+            if (!btn || !root) {
+                return;
+            }
+
+            var label = btn.querySelector('[data-theme-label]');
+            var icon = btn.querySelector('[data-theme-icon]');
+
+            function applyTheme(theme) {
+                root.dataset.theme = theme;
+                try {
+                    localStorage.setItem('sb-theme', theme);
+                } catch (e) {
+                    /* ignore */
+                }
+                if (label) {
+                    label.textContent = theme === 'light' ? 'Light' : 'Dark';
+                }
+                if (icon) {
+                    icon.textContent = theme === 'light' ? '☀' : '☾';
+                }
+            }
+
+            var initial = root.dataset.theme === 'light' ? 'light' : 'dark';
+            applyTheme(initial);
+
+            btn.addEventListener('click', function () {
+                var next = root.dataset.theme === 'light' ? 'dark' : 'light';
+                applyTheme(next);
+            });
+        })();
+    </script>
 </body>
 </html>
