@@ -1,0 +1,64 @@
+web:
+  replicaCount: 2
+
+ 
+  image:
+    repository: registry.scarlettbytes.nl/scarlett/scarlettbytes.nl
+    tag: "v0.1.0"         
+    pullPolicy: IfNotPresent
+
+  env:
+    - name: FLASK_ENV
+      value: production
+    - name: MEMCACHED_HOST
+      value: scarlettbytes-scarlettbytes-memcached.scarlettbytes.svc.cluster.local
+    - name: MEMCACHED_PORT
+      value: "11211"
+
+  service:
+    type: ClusterIP
+    port: 80        
+    targetPort: 8000
+
+  resources: 
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+memcached:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: memcached
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 11211
+
+  resources: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: scarlettbytes.nl
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: 
+    - secretName: scarlettbytes-tls
+      hosts:
+        - scarlettbytes.nl
+
+podAnnotations: {}
+podLabels: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

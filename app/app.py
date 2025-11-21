@@ -1,3 +1,4 @@
+from os import environ, getenv
 import warnings
 from flask import Flask, Response, send_file, render_template, redirect, request
 from flask_limiter import Limiter
@@ -16,15 +17,17 @@ warnings.filterwarnings(
 
 app = Flask(import_name=__name__)
 
+memcached_host = getenv("MEMCACHED_HOST", "memcached")
+
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri="memcached://memcached:11211",
+    storage_uri=f"memcached://{memcached_host}:11211",
     app=app,
     default_limits=["200 per day", "50 per hour"],
 )
 
 
-mc = base.Client(server=("memcached", 11211))
+mc = base.Client((memcached_host, 11211))
 
 # Cache for the GPG key and the time it was last updated
 _key_cache: Optional[str] = None

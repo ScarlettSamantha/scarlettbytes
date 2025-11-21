@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scarlettbytes.fullname" . }}-web
+  labels:
+    {{- include "scarlettbytes.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  replicas: {{ .Values.web.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "scarlettbytes.selectorLabels.web" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "scarlettbytes.selectorLabels.web" . | nindent 8 }}
+      annotations:
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: gitlab-regcred
+      containers:
+        - name: web
+          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
+          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.web.service.targetPort }}
+          env:
+            {{- range .Values.web.env }}
+            - name: {{ .name }}
+              value: {{ quote .value }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}

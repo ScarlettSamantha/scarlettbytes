@@ -1,0 +1,18 @@
+{{- if .Values.memcached.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "scarlettbytes.fullname" . }}-memcached
+  labels:
+    {{- include "scarlettbytes.labels" . | nindent 4 }}
+    app.kubernetes.io/component: memcached
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.memcached.service.port }}
+      targetPort: {{ .Values.memcached.service.port }}
+      protocol: TCP
+      name: memcached
+  selector:
+    {{- include "scarlettbytes.selectorLabels.memcached" . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,31 @@
+{{- if .Values.memcached.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scarlettbytes.fullname" . }}-memcached
+  labels:
+    {{- include "scarlettbytes.labels" . | nindent 4 }}
+    app.kubernetes.io/component: memcached
+spec:
+  replicas: {{ .Values.memcached.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "scarlettbytes.selectorLabels.memcached" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "scarlettbytes.selectorLabels.memcached" . | nindent 8 }}
+    spec:
+      containers:
+        - name: memcached
+          image: "{{ .Values.memcached.image.repository }}:{{ .Values.memcached.image.tag }}"
+          imagePullPolicy: {{ .Values.memcached.image.pullPolicy }}
+          ports:
+            - name: memcached
+              containerPort: {{ .Values.memcached.service.port }}
+          args:
+            - "-m"
+            - "64"
+          resources:
+            {{- toYaml .Values.memcached.resources | nindent 12 }}
+{{- end }}
