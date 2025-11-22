@@ -5,7 +5,7 @@ web:
   image:
     repository: registry.scarlettbytes.nl/scarlett/scarlettbytes.nl
     tag: latest        
-    pullPolicy: always
+    pullPolicy: Always
 
   env:
     - name: FLASK_ENV
