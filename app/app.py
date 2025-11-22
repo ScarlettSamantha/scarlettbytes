@@ -23,7 +23,7 @@ warnings.filterwarnings(
 
 app = Flask(import_name=__name__)
 
-memcached_host = getenv("MEMCACHED_HOST", "memcached")
+memcached_host = getenv("MEMCACHED_HOST", "scarlettbytes-memcached")
 
 limiter: Limiter = Limiter(
     key_func=get_remote_address,
