@@ -4,8 +4,8 @@ web:
  
   image:
     repository: registry.scarlettbytes.nl/scarlett/scarlettbytes.nl
-    tag: "latest"         
-    pullPolicy: IfNotPresent
+    tag: latest        
+    pullPolicy: always
 
   env:
     - name: FLASK_ENV
