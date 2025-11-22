@@ -4,7 +4,7 @@ web:
  
   image:
     repository: registry.scarlettbytes.nl/scarlett/scarlettbytes.nl
-    tag: "v0.1.0"         
+    tag: "latest"         
     pullPolicy: IfNotPresent
 
   env:
