@@ -4,9 +4,10 @@ from datetime import datetime, timedelta
 import json
 import re
 from typing import Optional, Dict, Any, List, TypedDict, cast
+from pathlib import Path
 
 import requests
-from flask import Flask, Response, send_file, render_template, redirect, request
+from flask import Flask, Response, send_file, render_template, redirect, request, abort
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from pymemcache.client import base
@@ -44,6 +45,46 @@ GITHUB_TOKEN: Optional[str] = getenv("GITHUB_TOKEN")
 
 _logged_token_state: bool = False
 
+BLOG_DIR: Path = Path("blog")
+BLOG_CACHE_TIMEOUT: int = 60
+
+
+description: str = (
+    "Scarlett Samantha Verheul is a Software Developer from Rotterdam, "
+    "Netherlands. I specialize in Python, Flask, Docker, DevOps, Linux, "
+    "and Open Source."
+)
+
+default_template_vars: Dict[str, Any] = {
+    "title": "Scarlett Samantha Verheul - Software Developer",
+    "author": "Scarlett Samantha Verheul",
+    "keywords": ",".join(
+        [
+            "Scarlett Samantha Verheul",
+            "Scarlett VerheulScarlettSamantha",
+            "Scarlett",
+            "Software Developer",
+            "Python",
+            "Flask",
+            "Docker",
+            "DevOps",
+            "Linux",
+            "Open Source",
+            "Rotterdam",
+            "Netherlands",
+            "Vacancies",
+            "Jobs",
+            "Hiring",
+            "PHP",
+            "Laravel",
+            "Symfony",
+        ]
+    ),
+    "description": description,
+    "og_title": "Scarlett Samantha Verheul - Software Developer",
+    "og_description": description,
+}
+
 
 class CommitInfo(TypedDict):
     sha: str
@@ -53,7 +94,19 @@ class CommitInfo(TypedDict):
     repo: str
 
 
-def _cache_get(key: str) -> Optional[Any]:
+class BlogPost(TypedDict):
+    slug: str
+    title: str
+    date: str
+    summary: str
+    content: str
+
+
+_blog_cache: Optional[List[BlogPost]] = None
+_blog_cache_time: Optional[datetime] = None
+
+
+def _cache_get(key: str) -> Optional[Dict[str, Any]]:
     try:
         raw = mc.get(key)
     except Exception as exc:
@@ -167,13 +220,12 @@ def fetch_recent_commits(
     cache_key: str = f"github:repo_commits:{author}/{repo}:{limit}"
 
     if not bypass_cache:
-        cached: Optional[Any] = _cache_get(cache_key)
+        cached: Optional[Dict[str, Any]] = _cache_get(cache_key)
         if isinstance(cached, Dict) and isinstance(cached.get("commits"), list):
-            raw_commits: List[Any] = cached["commits"]
+            raw_commits: List[Dict[str, Any]] = cached["commits"]
             commits_from_cache: List[CommitInfo] = []
             for item in raw_commits:
-                if not isinstance(item, Dict):
-                    continue
+                item: Dict[str, Any] = item
                 commits_from_cache.append(
                     CommitInfo(
                         sha=str(item.get("sha", "")),
@@ -203,8 +255,7 @@ def fetch_recent_commits(
     repo_display: str = f"{author}/{repo}"
 
     for item in response.json():
-        if not isinstance(item, Dict):
-            continue
+        item: Dict[str, Any] = item
 
         commit_data: Dict[str, Any] = cast(Dict[str, Any], item.get("commit", {}))
         author_info: Dict[str, Any] = cast(
@@ -253,13 +304,11 @@ def fetch_user_recent_commits(
     cache_key: str = f"github:user_commits:{username}:{limit}"
 
     if not bypass_cache:
-        cached: Optional[Any] = _cache_get(cache_key)
+        cached: Optional[Dict[str, Any]] = _cache_get(cache_key)
         if isinstance(cached, Dict) and isinstance(cached.get("commits"), list):
-            raw_commits: List[Any] = cached["commits"]
+            raw_commits: List[Dict[str, Any]] = cached["commits"]
             commits_from_cache: List[CommitInfo] = []
             for item in raw_commits:
-                if not isinstance(item, Dict):
-                    continue
                 commits_from_cache.append(
                     CommitInfo(
                         sha=str(item.get("sha", "")),
@@ -287,8 +336,7 @@ def fetch_user_recent_commits(
     commits: List[CommitInfo] = []
 
     for repo_data in repos_response.json():
-        if not isinstance(repo_data, Dict):
-            continue
+        repo_data: Dict[str, Any] = repo_data
 
         owner_login: str = str(
             cast(Dict[str, Any], repo_data.get("owner", {})).get("login") or username
@@ -327,7 +375,7 @@ def fetch_user_recent_commits(
 def get_git_info(author: str, repo: str) -> Dict[str, str]:
     cache_key: str = f"github:git_info:{author}/{repo}"
 
-    cached: Optional[Any] = _cache_get(cache_key)
+    cached: Optional[Dict[str, Any]] = _cache_get(cache_key)
     if isinstance(cached, Dict):
         commit_hash_cached: str = str(cached.get("commit_hash", "unknown"))
         branch_name_cached: str = str(cached.get("branch_name", "unknown"))
@@ -374,7 +422,7 @@ def fetch_latest_package_zip(
     cache_key: str = f"github:latest_zip:{author}/{package}"
 
     if not bypass_cache:
-        cached: Optional[Any] = _cache_get(cache_key)
+        cached: Optional[Dict[str, Any]] = _cache_get(cache_key)
         if isinstance(cached, Dict) and cached.get("zip_url"):
             return str(cached["zip_url"])
 
@@ -407,6 +455,92 @@ def fetch_latest_package_zip(
     _cache_set(cache_key, payload, ttl=CACHE_TIMEOUT)
 
     return str(zip_url)
+
+
+def _parse_blog_file(path: Path) -> Optional[BlogPost]:
+    try:
+        raw: str = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        app.logger.error("Failed to read blog file %s: %s", path, exc)
+        return None
+
+    lines: List[str] = raw.splitlines()
+    meta: Dict[str, str] = {}
+    body_lines: List[str] = []
+    in_header: bool = True
+    started_header: bool = False
+
+    for line in lines:
+        stripped: str = line.strip()
+        if not started_header and stripped == "---":
+            started_header = True
+            continue
+        if in_header:
+            if not stripped:
+                in_header = False
+                continue
+            if ":" in line:
+                key, value = line.split(":", 1)
+                meta[key.strip().lower()] = value.strip()
+            else:
+                in_header = False
+                body_lines.append(line)
+        else:
+            body_lines.append(line)
+
+    slug: str = meta.get("slug") or path.stem
+    title: str = meta.get("title") or path.stem.replace("-", " ").title()
+
+    file_mtime: float = path.stat().st_mtime
+    date_str: str = meta.get("date") or datetime.fromtimestamp(file_mtime).strftime(
+        "%Y-%m-%d"
+    )
+
+    body: str = "\n".join(body_lines).strip()
+    summary: str = meta.get("summary", "")
+
+    if not summary:
+        first_line: str = body.split("\n", 1)[0]
+        if len(first_line) > 160:
+            summary = first_line[:157].rstrip() + "..."
+        else:
+            summary = first_line
+
+    return BlogPost(
+        slug=slug,
+        title=title,
+        date=date_str,
+        summary=summary,
+        content=body,
+    )
+
+
+def get_blog_posts() -> List[BlogPost]:
+    global _blog_cache, _blog_cache_time
+
+    if (
+        _blog_cache is not None
+        and _blog_cache_time is not None
+        and (datetime.now() - _blog_cache_time) < timedelta(seconds=BLOG_CACHE_TIMEOUT)
+    ):
+        return _blog_cache
+
+    posts: List[BlogPost] = []
+
+    if BLOG_DIR.exists() and BLOG_DIR.is_dir():
+        for path in sorted(
+            BLOG_DIR.glob("*.md"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        ):
+            parsed: Optional[BlogPost] = _parse_blog_file(path)
+            if parsed is not None:
+                posts.append(parsed)
+
+    _blog_cache = posts
+    _blog_cache_time = datetime.now()
+
+    return posts
 
 
 @app.route(rule="/gpg", methods=["GET"])
@@ -444,6 +578,7 @@ def lshw_parser_download() -> WerkzeugResponse:
 
     if zip_url:
         return redirect(location=zip_url)
+
     return Response(
         response='{"error": "Unable to find the latest release zip URL."}',
         status=404,
@@ -470,6 +605,7 @@ def openciv_download() -> WerkzeugResponse:
 
     if zip_url:
         return redirect(location=zip_url)
+
     return Response(
         response='{"error": "Unable to find the latest release zip URL."}',
         status=404,
@@ -496,6 +632,7 @@ def json_inspector_download() -> WerkzeugResponse:
 
     if zip_url:
         return redirect(location=zip_url)
+
     return Response(
         response='{"error": "Unable to find the latest release zip URL."}',
         status=404,
@@ -532,6 +669,53 @@ def cv() -> Response:
     )
 
 
+@app.route(rule="/blog", methods=["GET"])
+@limiter.limit(limit_value="10 per minute")
+def blog_index() -> str:
+    git_info: Dict[str, str] = get_git_info(
+        author="ScarlettSamantha",
+        repo="scarlettbytes",
+    )
+
+    posts: List[BlogPost] = get_blog_posts()
+
+    return render_template(
+        template_name_or_list="blog_index.j2",
+        commit_hash=git_info["commit_hash"],
+        branch_name=git_info["branch_name"],
+        posts=posts,
+        **default_template_vars,
+    )
+
+
+@app.route(rule="/blog/<slug>", methods=["GET"])
+@limiter.limit(limit_value="10 per minute")
+def blog_post(slug: str) -> str:
+    git_info: Dict[str, str] = get_git_info(
+        author="ScarlettSamantha",
+        repo="scarlettbytes",
+    )
+
+    posts: List[BlogPost] = get_blog_posts()
+    post: Optional[BlogPost] = None
+
+    for candidate in posts:
+        if candidate["slug"] == slug:
+            post = candidate
+            break
+
+    if post is None:
+        abort(404)
+
+    return render_template(
+        template_name_or_list="blog_post.j2",
+        commit_hash=git_info["commit_hash"],
+        branch_name=git_info["branch_name"],
+        post=post,
+        **default_template_vars,
+    )
+
+
 @app.route(rule="/", defaults={"path": ""})
 @app.route(rule="/<path:path>")
 @limiter.limit(limit_value="10 per minute")
@@ -541,48 +725,21 @@ def catch_all(path: str) -> str:
         repo="scarlettbytes",
     )
 
-    description: str = (
-        "Scarlett Samantha Verheul is a Software Developer from Rotterdam, Netherlands. "
-        "I specialize in Python, Flask, Docker, DevOps, Linux, and Open Source."
-    )
-
     recent_commits: List[CommitInfo] = fetch_user_recent_commits(
         username="ScarlettSamantha",
         limit=5,
     )
+
+    blog_posts: List[BlogPost] = get_blog_posts()
+    recent_posts: List[BlogPost] = blog_posts[:3]
 
     return render_template(
         template_name_or_list="home.j2",
         commit_hash=git_info["commit_hash"],
         branch_name=git_info["branch_name"],
         recent_commits=recent_commits,
-        author="Scarlett Samantha Verheul",
-        keywords=",".join(
-            [
-                "Scarlett Samantha Verheul",
-                "ScarlettSamantha",
-                "Scarlett",
-                "Software Developer",
-                "Python",
-                "Flask",
-                "Docker",
-                "DevOps",
-                "Linux",
-                "Open Source",
-                "Rotterdam",
-                "Netherlands",
-                "Vacancies",
-                "Jobs",
-                "Hiring",
-                "PHP",
-                "Laravel",
-                "Symfony",
-            ]
-        ),
-        description=description,
-        og_title="Scarlett Samantha Verheul - Software Developer",
-        og_description=description,
-        og_url=request.url_root,
+        recent_posts=recent_posts,
+        **default_template_vars,
     )
 
 
@@ -597,6 +754,7 @@ def equipment() -> str:
         template_name_or_list="equipment.j2",
         commit_hash=git_info["commit_hash"],
         branch_name=git_info["branch_name"],
+        **default_template_vars,
     )
 
 

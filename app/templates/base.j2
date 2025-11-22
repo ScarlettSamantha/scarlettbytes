@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,6 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ og_url }}">
 
-    <!-- Set theme before CSS loads (defaults to dark) -->
     <script>
         (function () {
             try {
@@ -32,7 +32,10 @@
 
 <body>
     <div class="shell">
-        {% include '_header.j2' %}
+        <header class="site-header">
+            {% block nav %}{% include '_nav.j2' %}{% endblock %}
+            {% block header %}{% include '_header.j2' %}{% endblock %}
+        </header>
 
         <main class="site-main">
             <div class="container content">
@@ -79,4 +82,5 @@
         })();
     </script>
 </body>
+
 </html>

@@ -1,36 +1,5 @@
 {% extends 'base.j2' %}
 
-{% block header %}
-<section class="hero">
-    <div class="hero-layout">
-        <div class="hero-text">
-            <p class="eyebrow">Hi, I’m Scarlett</p>
-            <h1 class="hero-title">Senior backend engineer and open-source nerd.</h1>
-            <p class="hero-subtitle">
-                I build backend systems, infra and weird little tools.
-                Mostly Python, PHP, Linux and a borderline unhealthy love for automation.
-            </p>
-            <div class="hero-chips">
-                <span class="chip">Rotterdam area, NL</span>
-                <span class="chip">Python · Flask · DevOps</span>
-                <span class="chip">PHP 8.3 · Symfony/Laravel</span>
-            </div>
-        </div>
-
-        <div class="hero-aside">
-            <div class="hero-card">
-                <h2 class="hero-card-title">Currently hacking on</h2>
-                <ul class="bullet-list">
-                    <li>OpenCiv – a Civ-like built with Panda3D and Kivy.</li>
-                    <li>Rendition Server – a high-throughput image rendition backend.</li>
-                    <li>Small utilities that keep my machines and myself organised.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
-
 {% block content %}
 <div class="cards-grid">
     <section class="card">
@@ -88,12 +57,38 @@
                     {{ commit.message }}
                 </a>
                 <span class="commit-meta mono">
-                    {{ commit.sha }} · {{ commit.date }}
+                    <a class="link-inline" href="https://github.com/{{ commit.repo }}" target="_blank" rel="noreferrer">
+                        {{ commit.repo }}
+                    </a>
+                    <span class="push-right">{{ commit.sha }} · {{ commit.date }}</span>
                 </span>
             </li>
             {% else %}
             <li class="commit-row">
                 <span class="commit-meta">Unable to load recent commits right now.</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2 class="card-title">Latest posts</h2>
+        <ul class="post-list">
+            {% for post in recent_posts %}
+            <li class="post-row">
+                <a class="post-title" href="{{ url_for('blog_post', slug=post.slug) }}">
+                    {{ post.title }}
+                </a>
+                <span class="post-meta mono">
+                    {{ post.date }}
+                </span>
+                <p class="post-summary">
+                    {{ post.summary }}
+                </p>
+            </li>
+            {% else %}
+            <li class="post-row">
+                <span class="post-meta">No blog posts yet.</span>
             </li>
             {% endfor %}
         </ul>

@@ -1,39 +1,24 @@
-<header class="site-header">
-    <div class="container header-bar">
-        <a href="{{ url_for('catch_all', path='') }}" class="brand">
-            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Scarlett logo" class="brand-logo" />
-        </a>
-        <nav class="nav">
-            <a href="{{ url_for('catch_all', path='') }}" class="nav-link">Home</a>
-            <a href="{{ url_for('cv') }}" class="nav-link">CV</a>
-            <a href="{{ url_for('gpg') }}" class="nav-link">GPG</a>
-            <a href="{{ url_for('equipment') }}" class="nav-link">Equipment</a>
-            <a href="https://github.com/ScarlettSamantha" class="nav-link" target="_blank" rel="noreferrer">GitHub☍</a>
-            <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">
-                <span data-theme-icon>☾</span>
-                <span data-theme-label>Dark</span>
-            </button>
-        </nav>
-    </div>
+{% set home_url = url_for('catch_all', path='') %}
+{% set is_home = request.path == home_url %}
 
-    <div class="container">
-        {% block header %}
-        <section class="hero hero--compact">
-            <div class="hero-layout">
-                <div class="hero-text">
-                    <p class="eyebrow">Hi, I’m Scarlett</p>
-                    <h1 class="hero-title">Senior software engineer/enthusiast</h1>
-                    <p class="hero-subtitle">
-                        Python, PHP, infra, some game development.
-                    </p>
-                    <div class="hero-chips">
-                        <span class="chip">Rotterdam area, NL</span>
-                        <span class="chip">Python · Flask · DevOps</span>
-                        <span class="chip">PHP 8.x · Symfony/Laravel</span>
-                    </div>
+{% if is_home %}
+<div class="container">
+    <section class="hero hero--compact hero--home">
+        <div class="hero-layout">
+            <div class="hero-text">
+                <p class="eyebrow">Hi, I’m Scarlett</p>
+                <h1 class="hero-title">Senior Software Engineer/Enthusiast</h1>
+                <p class="hero-subtitle">
+                    I build backend-heavy systems, infra, sometimes games.
+                    Mostly Python, PHP, Linux and automation.
+                </p>
+                <div class="hero-chips">
+                    <span class="chip chip-yellow">Rotterdam area, NL</span>
+                    <span class="chip chip-green">Python · Flask · DevOps</span>
+                    <span class="chip chip-blue">PHP 8.x · Symfony/Laravel</span>
                 </div>
             </div>
-        </section>
-        {% endblock %}
-    </div>
-</header>
+        </div>
+    </section>
+</div>
+{% endif %}

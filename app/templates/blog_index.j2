@@ -1,0 +1,40 @@
+{% extends 'base.j2' %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <h1 class="page-title">Blog</h1>
+    {% if posts %}
+    <p class="page-subtitle">Just my thoughts.</p>
+    {% else %}
+    <p class="page-subtitle">No posts yet, check back later.</p>
+    {% endif %}
+</header>
+
+<section class="card">
+    <ul class="post-list">
+        {% for post in posts %}
+        <li class="post-row">
+            <div class="post-row-header">
+                <a class="post-title" href="{{ url_for('blog_post', slug=post.slug) }}">
+                    {{ post.title }}
+                </a>
+                <span class="post-meta mono">
+                    {{ post.date }}
+                </span>
+            </div>
+            {% if post.summary %}
+            <p class="post-summary">
+                {{ post.summary }}
+            </p>
+            {% endif %}
+        </li>
+        {% else %}
+        <li class="post-row">
+            <span class="post-meta">No blog posts yet.</span>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

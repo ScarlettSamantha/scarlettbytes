@@ -1,0 +1,36 @@
+{% extends 'base.j2' %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<header class="page-heading blog-heading">
+    <a class="link-inline blog-heading-back" href="{{ url_for('blog_index') }}">
+        ← Back to blog
+    </a>
+
+    <div class="blog-heading-main">
+        <h1 class="page-title blog-heading-title">
+            {{ post.title }}
+        </h1>
+        <p class="post-meta mono blog-heading-meta">
+            {{ post.date }}
+        </p>
+    </div>
+</header>
+
+<section class="card blog-post-card">
+    {% if post.summary %}
+    <p class="post-summary">
+        {{ post.summary }}
+    </p>
+    {% endif %}
+
+    <div class="blog-body">
+        {{ ('<p>' ~ post.content
+            | e
+            | replace('\n\n', '</p><p>')
+            | replace('\n', '<br>')
+            ~ '</p>') | safe }}
+    </div>
+</section>
+{% endblock %}

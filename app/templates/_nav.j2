@@ -1,0 +1,51 @@
+<div class="container header-bar">
+    <a href="{{ url_for('catch_all', path='') }}" class="brand">
+        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Scarlett logo" class="brand-logo" />
+    </a>
+
+    {% set current_path = request.path %}
+    {% set home_url = url_for('catch_all', path='') %}
+    {% set blog_index_url = url_for('blog_index') %}
+    {% set cv_url = url_for('cv') %}
+    {% set gpg_url = url_for('gpg') %}
+    {% set equipment_url = url_for('equipment') %}
+    {% set on_blog = current_path.startswith('/blog') %}
+    {% set on_home = current_path == home_url %}
+
+    <nav class="nav">
+        <a href="{{ home_url }}" class="nav-link{% if on_home %} nav-link--active{% endif %}"
+            {% if on_home %}aria-current="page" {% endif %}>
+            Home
+        </a>
+
+        <a href="{{ blog_index_url }}" class="nav-link{% if on_blog %} nav-link--active{% endif %}"
+            {% if on_blog %}aria-current="page" {% endif %}>
+            Blog
+        </a>
+
+        <a href="{{ cv_url }}" class="nav-link{% if current_path == cv_url %} nav-link--active{% endif %}"
+            {% if current_path == cv_url %}aria-current="page" {% endif %}>
+            CV
+        </a>
+
+        <a href="{{ gpg_url }}" class="nav-link{% if current_path == gpg_url %} nav-link--active{% endif %}"
+            {% if current_path == gpg_url %}aria-current="page" {% endif %}>
+            GPG
+        </a>
+
+        <a href="{{ equipment_url }}" class="nav-link{% if current_path == equipment_url %} nav-link--active{% endif %}"
+            {% if current_path == equipment_url %}aria-current="page" {% endif %}>
+            Equipment
+        </a>
+
+        <a href="https://github.com/ScarlettSamantha" class="nav-link nav-link--external" target="_blank"
+            rel="noreferrer">
+            GitHub☍
+        </a>
+
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">
+            <span data-theme-icon>☾</span>
+            <span data-theme-label>Dark</span>
+        </button>
+    </nav>
+</div>
